@@ -5,31 +5,38 @@ from flask import Flask, render_template_string
 import os
 import threading
 import time
-from dotenv import load_dotenv
-
-# Загружаем переменные окружения из .env файла (для локальной разработки)
-load_dotenv()
 
 # Получаем токены из переменных окружения
 TOKEN = os.environ.get('TELEGRAM_TOKEN')
 DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY')
 
-print(f"DEBUG: TOKEN = {'Установлен' if TOKEN else 'Не установлен'}")
-print(f"DEBUG: DEEPSEEK_API_KEY = {'Установлен' if DEEPSEEK_API_KEY else 'Не установлен'}")
+# Отладочная информация
+print(f"DEBUG: TELEGRAM_TOKEN доступен: {'Да' if TOKEN else 'Нет'}")
+print(f"DEBUG: DEEPSEEK_API_KEY доступен: {'Да' if DEEPSEEK_API_KEY else 'Нет'}")
 
 # Проверяем наличие обязательного токена Telegram
 if not TOKEN:
     print("❌ КРИТИЧЕСКАЯ ОШИБКА: TELEGRAM_TOKEN не найден!")
-    print("Проверьте:")
-    print("1. На Render: Environment Variables в настройках сервиса")
-    print("2. Локально: наличие файла .env с TELEGRAM_TOKEN=ваш_токен")
+    print("Убедитесь, что на Render добавлена переменная окружения TELEGRAM_TOKEN")
+    print("На Render: Environment → Add Environment Variable")
     exit(1)
 
 try:
     bot = telebot.TeleBot(TOKEN)
     print(f"✅ Бот успешно инициализирован")
+
+    # Проверяем соединение с Telegram API
+    bot_info = bot.get_me()
+    print(f"✅ Подключение к Telegram API успешно")
+    print(f"   Имя бота: @{bot_info.username}")
+    print(f"   ID бота: {bot_info.id}")
+
 except Exception as e:
     print(f"❌ Ошибка инициализации бота: {e}")
+    print("Возможные причины:")
+    print("1. Неверный токен бота")
+    print("2. Проблемы с подключением к интернету")
+    print("3. Проблемы с сервером Telegram")
     exit(1)
 
 app = Flask(__name__)
