@@ -5,10 +5,33 @@ from flask import Flask, render_template_string
 import os
 import threading
 import time
+from dotenv import load_dotenv
 
-TOKEN = os.environ.get('8575301317:AAHS00AiMtKxD7BBwuf0XZiSxsvOca-cqBY')
-bot = telebot.TeleBot(TOKEN)
-DEEPSEEK_API_KEY = os.environ.get('sk-06d469e0b76e41929d9fb8081b188907')
+# Загружаем переменные окружения из .env файла (для локальной разработки)
+load_dotenv()
+
+# Получаем токены из переменных окружения
+TOKEN = os.environ.get('TELEGRAM_TOKEN')
+DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY')
+
+print(f"DEBUG: TOKEN = {'Установлен' if TOKEN else 'Не установлен'}")
+print(f"DEBUG: DEEPSEEK_API_KEY = {'Установлен' if DEEPSEEK_API_KEY else 'Не установлен'}")
+
+# Проверяем наличие обязательного токена Telegram
+if not TOKEN:
+    print("❌ КРИТИЧЕСКАЯ ОШИБКА: TELEGRAM_TOKEN не найден!")
+    print("Проверьте:")
+    print("1. На Render: Environment Variables в настройках сервиса")
+    print("2. Локально: наличие файла .env с TELEGRAM_TOKEN=ваш_токен")
+    exit(1)
+
+try:
+    bot = telebot.TeleBot(TOKEN)
+    print(f"✅ Бот успешно инициализирован")
+except Exception as e:
+    print(f"❌ Ошибка инициализации бота: {e}")
+    exit(1)
+
 app = Flask(__name__)
 
 
